@@ -12,8 +12,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path"
-	"reflect"
-	"strconv"
 	"strings"
 
 	"github.com/rackspace/gophercloud"
@@ -77,47 +75,6 @@ type Credentials struct {
 	DockerHost string
 	Files      map[string][]byte
 	UUID       UUID
-}
-
-// Specify this type for any struct fields that
-// might be unmarshaled from JSON numbers of the following
-// types: floats, integers, scientific notation, or strings
-type number float64
-
-func (n number) Int64() int64 {
-	return int64(n)
-}
-
-func (n number) Int() int {
-	return int(n)
-}
-
-func (n number) Float64() float64 {
-	return float64(n)
-}
-
-// Required to enforce that string values are attempted to be parsed as numbers
-func (n *number) UnmarshalJSON(data []byte) error {
-	var f float64
-	var err error
-	if data[0] == '"' {
-		f, err = strconv.ParseFloat(string(data[1:len(data)-1]), 64)
-		if err != nil {
-			return &json.UnmarshalTypeError{
-				Value: string(data),
-				Type:  reflect.TypeOf(*n),
-			}
-		}
-	} else {
-		if err := json.Unmarshal(data, &f); err != nil {
-			return &json.UnmarshalTypeError{
-				Value: string(data),
-				Type:  reflect.TypeOf(*n),
-			}
-		}
-	}
-	*n = number(f)
-	return nil
 }
 
 func newClusterClient(endpoint string, ao gophercloud.AuthOptions) (*ClusterClient, error) {
@@ -410,7 +367,7 @@ func fetchZip(zipurl string) (*zip.Reader, error) {
 	return zip.NewReader(b, int64(b.Len()))
 }
 
-// Grow increases a cluster by the provided number of nodes
+// Grow increases a cluster by the provided  of nodes
 func (c *ClusterClient) Grow(clusterName string, nodes int) (*Cluster, error) {
 	incr := map[string]int{
 		"nodes": nodes,
