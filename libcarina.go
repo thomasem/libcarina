@@ -58,7 +58,7 @@ type Cluster struct {
 	// Node is optional, but allowed on create
 	// Sadly it comes back as string instead of int in all cases
 	// with the API
-	Nodes number `json:"nodes,omitempty"`
+	Nodes json.Number `json:"nodes,omitempty"`
 
 	AutoScale bool   `json:"autoscale,omitempty"`
 	Status    string `json:"status,omitempty"`
@@ -213,6 +213,7 @@ func (c *ClusterClient) Create(clusterOpts Cluster) (*Cluster, error) {
 		clusterOpts.Username = c.Username
 	}
 	clusterOptsJSON, err := json.Marshal(clusterOpts)
+
 	if err != nil {
 		return nil, err
 	}
